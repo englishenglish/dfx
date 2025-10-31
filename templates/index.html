@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>温馨提示</title>
+    <style>
+        body {
+            background-color: #FFF8F0;
+            font-family: "微软雅黑", sans-serif;
+            overflow: hidden;
+        }
+        .popup {
+            position: fixed;
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: #333;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            animation: fadeInOut 3s ease forwards;
+        }
+        @keyframes fadeInOut {
+            0% {opacity: 0;}
+            10% {opacity: 1;}
+            90% {opacity: 1;}
+            100% {opacity: 0;}
+        }
+    </style>
+</head>
+<body>
+    <script>
+        function showPopup(message, color) {
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+            popup.style.backgroundColor = color;
+            popup.textContent = message;
+
+            // 随机位置
+            const x = Math.random() * (window.innerWidth - 200);
+            const y = Math.random() * (window.innerHeight - 100);
+            popup.style.left = `${x}px`;
+            popup.style.top = `${y}px`;
+
+            document.body.appendChild(popup);
+
+            // 3秒后移除
+            setTimeout(() => popup.remove(), 3000);
+        }
+
+        // 每隔 2 秒获取一条温馨提示
+        setInterval(() => {
+            fetch('/random_message')
+                .then(res => res.json())
+                .then(data => showPopup(data.message, data.color))
+                .catch(console.error);
+        }, 2000);
+    </script>
+</body>
+</html>
