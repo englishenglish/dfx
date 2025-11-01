@@ -1,59 +1,95 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>温馨提示</title>
-    <style>
-        body {
-            background-color: #FFF8F0;
-            font-family: "微软雅黑", sans-serif;
-            overflow: hidden;
-        }
-        .popup {
-            position: fixed;
-            padding: 15px 25px;
-            border-radius: 12px;
-            color: #333;
-            font-size: 20px;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            animation: fadeInOut 3s ease forwards;
-        }
-        @keyframes fadeInOut {
-            0% {opacity: 0;}
-            10% {opacity: 1;}
-            90% {opacity: 1;}
-            100% {opacity: 0;}
-        }
-    </style>
+<meta charset="UTF-8">
+<title>温馨提示</title>
+<style>
+body {
+    font-family: "微软雅黑", sans-serif;
+    overflow: hidden;
+    margin: 0;
+    height: 100vh;
+
+    /* 背景照片 */
+    background-image: url("{{ url_for('static', filename='background.jpg') }}");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* 可选遮罩 */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255, 248, 240, 0.4);
+    z-index: -1;
+}
+
+.popup {
+    position: fixed;
+    padding: 15px 25px;
+    border-radius: 12px;
+    color: #333;
+    font-size: 20px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation:
+        popIn 0.8s ease forwards,
+        floatY 3s ease-in-out infinite,
+        glowPulse 2s ease-in-out infinite;
+}
+
+.popup:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+@keyframes popIn {
+    0% {opacity: 0; transform: scale(0.3) rotate(-15deg);}
+    60% {opacity: 1; transform: scale(1.15) rotate(8deg);}
+    100% {transform: scale(1) rotate(0deg);}
+}
+
+@keyframes floatY {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+@keyframes glowPulse {
+    0%,100% { box-shadow: 0 0 10px rgba(255,255,255,0.3), 0 4px 12px rgba(0,0,0,0.2);}
+    50% { box-shadow: 0 0 25px rgba(255,255,255,0.7), 0 6px 20px rgba(0,0,0,0.3);}
+}
+</style>
 </head>
 <body>
-    <script>
-        function showPopup(message, color) {
-            const popup = document.createElement('div');
-            popup.className = 'popup';
-            popup.style.backgroundColor = color;
-            popup.textContent = message;
+<script>
+function showPopup(message, color) {
+    const popup = document.createElement('div');
+    popup.className = 'popup';
+    popup.style.backgroundColor = color;
+    popup.textContent = message;
 
-            // 随机位置
-            const x = Math.random() * (window.innerWidth - 200);
-            const y = Math.random() * (window.innerHeight - 100);
-            popup.style.left = `${x}px`;
-            popup.style.top = `${y}px`;
+    const x = Math.random() * (window.innerWidth - 200);
+    const y = Math.random() * (window.innerHeight - 100);
+    const angle = (Math.random() - 0.5) * 20;
+    popup.style.left = `${x}px`;
+    popup.style.top = `${y}px`;
+    popup.style.transform = `rotate(${angle}deg)`;
 
-            document.body.appendChild(popup);
+    popup.onclick = () => popup.remove();
+    document.body.appendChild(popup);
+}
 
-            // 3秒后移除
-            setTimeout(() => popup.remove(), 3000);
-        }
-
-        // 每隔 2 秒获取一条温馨提示
-        setInterval(() => {
-            fetch('/random_message')
-                .then(res => res.json())
-                .then(data => showPopup(data.message, data.color))
-                .catch(console.error);
-        }, 2000);
-    </script>
+setInterval(() => {
+    fetch('/random_message')
+        .then(res => res.json())
+        .then(data => showPopup(data.message, data.color))
+        .catch(console.error);
+}, 150);
+</script>
 </body>
 </html>
+
