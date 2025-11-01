@@ -1,12 +1,10 @@
-
 from flask import Flask, render_template, jsonify
 import random
 
-app = Flask(__name__)
-
+# 因为当前文件在 api/ 目录下，所以要指明模板和静态目录位置
+app = Flask(__name__, static_folder="../static", template_folder="../templates")
 
 nicknames = ["宝宝", "戴戴", "小猪崽子", "老婆", "猪包"]
-
 
 messages = [
     "要多多吃饭哟！💓", "天天都要开开心心哒💓", "我爱你💖", "能不能做我老婆呀🌹", "你好可爱呀",
@@ -15,7 +13,6 @@ messages = [
     "你睡觉的样子太可爱啦✨", "要按时吃饭😁", "想你想的得了相思病🌹", "你好香呀想闻死你✨", "拉屎好臭呀咦~嫌弃✨", "不要老是焦虑啦！😘"
 ]
 
-# 淡暖色调（hex）
 warm_colors = [
     "#FFEFD5", "#FFE4B5", "#FFDEAD", "#FFB6C1", "#FFCC99",
     "#FFFACD", "#FFF5EE", "#FFE4E1", "#FFDAB9", "#FFA07A",
@@ -32,11 +29,9 @@ def random_message():
     nickname = random.choice(nicknames)
     msg = random.choice(messages)
     color = random.choice(warm_colors)
-
-    # 在消息前加上昵称
     full_msg = f"{nickname}，{msg}"
-
     return jsonify({"message": full_msg, "color": color})
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+# ✅ 关键：Vercel 入口函数
+def handler(event, context):
+    return app(event, context)
